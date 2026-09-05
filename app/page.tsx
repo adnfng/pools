@@ -93,6 +93,7 @@ export default function Home() {
   const cursor = useRef<HTMLSpanElement>(null);
   const aimLine = useRef<HTMLSpanElement>(null);
   const engine = useRef<Engine | null>(null);
+  const cueHit = useRef({ x: 0, y: 0, r: 32 });
   const logHitRef = useRef<(letters: number) => void>(() => {});
   const [value, setValue] = useState('');
   const [failed, setFailed] = useState(false);
@@ -142,6 +143,10 @@ export default function Home() {
     let colorBag: number[] = [];
     let colorBagShuffled = false;
     let pendingLetters = 0;
+    const cueHome = {
+      x: 0.14 + Math.random() * 0.72,
+      y: 0.16 + Math.random() * 0.5,
+    };
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const axis = new THREE.Vector3();
     const rotation = new THREE.Quaternion();
@@ -183,6 +188,19 @@ export default function Home() {
     function positionMesh(ball: Ball) {
       ball.mesh.position.set(ball.x - width / 2, height / 2 - ball.y, 0);
       ball.mesh.scale.setScalar(size / 2);
+      if (ball === cueBall) cueHit.current = { x: ball.x, y: ball.y, r: size / 2 };
+    }
+
+    function cueSpawn() {
+      const pad = size * 1.15;
+      return {
+        x: THREE.MathUtils.clamp(width * cueHome.x, pad, width - pad),
+        y: THREE.MathUtils.clamp(height * cueHome.y, pad, height - 110),
+      };
+    }
+
+    function overCue(x: number, y: number, extra = 0) {
+      return Math.hypot(x - cueBall.x, y - cueBall.y) <= size / 2 + extra;
     }
 
     function draw(time = performance.now()) {
@@ -315,7 +333,8 @@ export default function Home() {
           moveHome(ball, start + positions[i].x + size / 2, firstY + rowIndex * rowHeight);
         }
       });
-      moveHome(cueBall, width * 0.24, Math.min(height * 0.72, height - 110));
+      const spawn = cueSpawn();
+      moveHome(cueBall, spawn.x, spawn.y);
       if (cursor.current) {
         const row = rows[caret.row];
         const x = chars.length ? (width - Math.max(0, row.width - gap)) / 2 + caret.x - gap / 2 : width / 2;
@@ -430,11 +449,12 @@ export default function Home() {
     }
 
     function pointerDown(event: PointerEvent) {
-      if (!event.isPrimary || event.pointerType !== 'mouse') return;
+      if (!event.isPrimary) return;
       const rect = container.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-      if (Math.hypot(x - cueBall.x, y - cueBall.y) > size / 2 + 6) return;
+      const pad = event.pointerType === 'mouse' ? 6 : 22;
+      if (!overCue(x, y, pad)) return;
       event.preventDefault();
       aiming = { pointerId: event.pointerId, x, y };
       container.setPointerCapture(event.pointerId);
@@ -447,6 +467,7 @@ export default function Home() {
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
       if (aiming?.pointerId === event.pointerId) {
+        event.preventDefault();
         aiming.x = x;
         aiming.y = y;
         aimAt(x, y);
@@ -511,8 +532,8 @@ export default function Home() {
 
     const observer = new ResizeObserver(resize);
     observer.observe(container);
-    container.addEventListener('pointerdown', pointerDown);
-    container.addEventListener('pointermove', pointerMove);
+    container.addEventListener('pointerdown', pointerDown, { passive: false });
+    container.addEventListener('pointermove', pointerMove, { passive: false });
     container.addEventListener('pointerup', pointerUp);
     container.addEventListener('pointercancel', pointerUp);
     window.addEventListener('keydown', onWindowKeyDown, true);
@@ -548,7 +569,22 @@ export default function Home() {
   }
 
   return (
-    <main className="pool-page" onPointerDownCapture={() => input.current?.focus({ preventScroll: true })}>
+    <main
+      className="pool-page"
+      onPointerDownCapture={(event) => {
+        const canvas = host.current;
+        if (!canvas) {
+          input.current?.focus({ preventScroll: true });
+          return;
+        }
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const pad = event.pointerType === 'mouse' ? 6 : 22;
+        if (Math.hypot(x - cueHit.current.x, y - cueHit.current.y) <= cueHit.current.r + pad) return;
+        input.current?.focus({ preventScroll: true });
+      }}
+    >
       <div ref={host} className="pool-canvas" aria-hidden="true" />
       <span ref={cursor} className="pool-cursor" aria-hidden="true" />
       <span ref={aimLine} className="aim-line" aria-hidden="true" />
@@ -560,6 +596,8 @@ export default function Home() {
         spellCheck={false}
         autoCapitalize="off"
         autoComplete="off"
+        autoCorrect="off"
+        inputMode="text"
         onChange={(event) => {
           const next = event.target.value;
           setValue(next);

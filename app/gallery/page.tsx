@@ -106,7 +106,7 @@ function GalleryCard({ entry, onOpen, onDownload }: { entry: GalleryEntry; onOpe
     </button>
     <div className="gallery-footer"><div className="gallery-name"><ColoredName name={entry.name} /></div>
     <button type="button" className="gallery-download" aria-label={`Download message by ${entry.name}`} onClick={onDownload}>
-      <Download size={14} strokeWidth={3} absoluteStrokeWidth aria-hidden="true" />
+      <Download size={14} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
     </button></div>
   </article>;
 }

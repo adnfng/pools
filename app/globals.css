@@ -98,7 +98,7 @@ button:disabled { cursor: default; opacity: .35; }
 .gallery-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
 .gallery-card { container-type: inline-size; position: relative; aspect-ratio: auto; padding-bottom: 0; min-width: 0; overflow: hidden; border: 0; border-radius: 8px; background: #fff; }
 .gallery-image-placeholder { display: block; width: 100%; aspect-ratio: 1; border-radius: 8px; }
-.gallery-download { display: flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; transition: color 140ms ease-out, transform 180ms cubic-bezier(.23, 1, .32, 1); flex: 0 0 auto; padding: 8px 0 8px 16px; border: 0; background: transparent; color: #E3E3E3; font-size: 16px; cursor: pointer; }
+.gallery-download { display: flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; transition: filter 140ms ease; flex: 0 0 auto; padding: 8px 0 8px 16px; border: 0; background: transparent; color: #e3e3e3; opacity: 1; font-size: 16px; cursor: pointer; }
 .skeleton { background: #f6f6f6; animation: skeleton-pulse 1.6s ease-in-out infinite alternate; }
 .skeleton-name { position: absolute; width: 28%; height: 12px; border-radius: 99px; left: 36%; bottom: 20px; }
 .pending-message, .image-error { position: absolute; inset: 0 8px 52px; display: flex; flex-wrap: wrap; gap: 8px; align-content: center; justify-content: center; align-items: center; color: #999; font-size: 10px; text-align: center; }
@@ -193,11 +193,11 @@ button:disabled { cursor: default; opacity: .35; }
 
 @media (hover: hover) and (pointer: fine) {
   .gallery-card:hover .message-preview { transform: scale(1.05); }
-  .gallery-download:hover { color: rgb(0 0 0 / 15%); transform: translateY(-5px); }
+  .gallery-download:hover { filter: brightness(90%); }
   .download-format:not(:disabled):hover { opacity: .8; transform: translateY(-5px) rotate(var(--format-rotation, 0deg)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .message-preview, .gallery-download, .download-format { transition: none; }
-  .gallery-card:hover .message-preview, .gallery-download:hover { transform: none; }
+  .gallery-card:hover .message-preview { transform: none; }
   .download-format:not(:disabled):hover { transform: rotate(var(--format-rotation, 0deg)); }
 }

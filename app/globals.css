@@ -1,15 +1,63 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-:root { --background: #fff; --foreground: #171717; color-scheme: light; }
+@font-face {
+  font-family: 'TT Rounds Neue';
+  src: url('/fonts/tt-rounds-neue-demibold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+:root { --background: #fff; --foreground: #0d0d0d; color-scheme: light; }
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--background); }
-body { font-family: Arial, Helvetica, sans-serif; }
-.pool-page { position: relative; width: 100%; height: 100dvh; background: #fff; cursor: text; overflow: hidden; }
-.pool-canvas { position: absolute; inset: 0; touch-action: none; }
+body { font-family: 'TT Rounds Neue', Arial, Helvetica, sans-serif; font-weight: 600; }
+.pool-page { position: relative; width: 100%; height: 100dvh; background: #fff; overflow: hidden; cursor: text; }
+.pool-canvas { position: absolute; inset: 0; z-index: 1; touch-action: none; }
 .pool-canvas canvas { display: block; }
-.pool-cursor { position: absolute; top: 0; left: 0; width: 2px; height: 45px; transform: translate(50vw, calc(50dvh - 22px)); background: #252525; border-radius: 1px; pointer-events: none; animation: blink 1.1s steps(1) infinite; }
+.pool-cursor { position: absolute; z-index: 2; top: 0; left: 0; width: 3px; height: 45px; transform: translate(50vw, calc(50dvh - 22px)); background: #6797ff; border-radius: 999px; pointer-events: none; animation: blink 1.1s steps(1) infinite; }
+.pool-cursor.is-hidden { display: none; }
 .pool-input { position: absolute; top: 50%; left: 50%; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; font-size: 16px; resize: none; overflow: hidden; }
-.fallback-input { position: absolute; inset: 30% 10%; border: 0; outline: 0; font-size: 48px; text-align: center; resize: none; background: white; }
+.fallback-input { position: absolute; inset: 30% 10%; border: 0; outline: 0; font-size: 48px; text-align: center; resize: none; background: #fff; }
+
+.aim-line { position: absolute; z-index: 3; top: 0; left: 0; display: block; height: 3px; opacity: 0; background-image: radial-gradient(circle at 1.5px 50%, #6797ff 0 1.5px, transparent 1.6px); background-repeat: repeat-x; background-size: 9px 3px; transform-origin: 0 50%; pointer-events: none; }
+.aim-line.is-visible { opacity: 1; }
+
+.pool-dock {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+.pool-metrics {
+  margin: 0;
+  color: #000;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  opacity: 0.2;
+  pointer-events: none;
+}
+.pool-reset { display: flex; gap: 4px; padding: 6px; border: 0; background: transparent; }
+.pool-reset span { position: relative; display: grid; width: 29px; height: 29px; place-items: center; overflow: hidden; border: 0; border-radius: 50%; color: #0d0d0d; font-size: 9px; font-weight: 600; line-height: 1; isolation: isolate; transition: transform 140ms ease; }
+.pool-reset span::before { content: ''; position: absolute; z-index: -1; width: 17px; height: 17px; border-radius: 50%; background: #e7e7e7; }
+.pool-reset:hover span:nth-child(odd) { transform: translateY(-2px) rotate(-8deg); }
+.pool-reset:hover span:nth-child(even) { transform: translateY(1px) rotate(7deg); }
+.pool-reset:active span { transform: scale(.9); }
+.pool-reset:focus-visible { outline: 2px solid #0c76ff; outline-offset: 3px; border-radius: 999px; }
+
 @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .pool-cursor { animation: none; } }
+@media (pointer: fine) {
+  .pool-canvas { cursor: grab; }
+  .pool-canvas:active { cursor: grabbing; }
+  .pool-reset { cursor: pointer; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pool-cursor { animation: none; }
+  .pool-reset span { transition: none; }
+}

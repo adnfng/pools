@@ -12,7 +12,8 @@ const formats = [
 ] as const;
 
 function appleTouch() {
-  return /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return /iP(hone|ad|od)/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && window.matchMedia('(pointer: coarse)').matches);
 }
 
 function exportSize(width: number, height: number) {
@@ -27,13 +28,12 @@ function canShare(file: File) {
 }
 
 async function deliver(file: File) {
-  if (canShare(file)) {
+  if (appleTouch() && canShare(file)) {
     try {
       await navigator.share({ files: [file] });
       return 'shared' as const;
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return 'shared' as const;
-      if (!appleTouch()) throw error;
     }
   }
   if (appleTouch()) return 'hold' as const;

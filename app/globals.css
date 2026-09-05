@@ -177,6 +177,9 @@ button:disabled { cursor: default; opacity: .35; }
 .download-format:active:not(:disabled) .format-shape { transform: scale(.97); }
 .download-format:focus-visible { outline: 2px solid #6797ff; outline-offset: 8px; border-radius: 8px; }
 .download-status { margin: 24px 0 0; color: rgb(0 0 0 / 40%); text-align: center; font-size: 12px; }
+.download-hold { position: absolute; inset: 80px 16px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+.download-hold img { max-width: 100%; max-height: calc(100dvh - 160px); object-fit: contain; border-radius: 8px; -webkit-touch-callout: default; }
+.download-hold p { margin: 0; color: #e3e3e3; font-size: 16px; }
 @media (prefers-reduced-motion: reduce) { .format-shape { transition: none; } }
 
 .skeleton-card { padding-bottom: 52px; }

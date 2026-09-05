@@ -19,7 +19,7 @@ Send opens the gallery immediately with a pending card and a retry option on
 failure. The gallery loads 25 records at a time using a stable timestamp + UUID
 cursor. Each square preview is rendered in the browser from the original text.
 Mobile uses one column; desktop expands to five or more. Downloads generate a
-high-quality WebP locally on demand in 1:1 (3200 × 3200), 3:4 (2400 × 3200),
+high-quality PNG locally on demand in 1:1 (3200 × 3200), 3:4 (2400 × 3200),
 or 9:16 (1800 × 3200); those images are never uploaded. Exports include a top-centered maker credit
 and an imsend.ing mini-ball watermark at the bottom.
 

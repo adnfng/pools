@@ -26,10 +26,8 @@ function blobFrom(canvas: HTMLCanvasElement, type: string, quality?: number) {
 }
 
 async function imageBlob(canvas: HTMLCanvasElement) {
-  const webp = await blobFrom(canvas, 'image/webp', .98);
-  if (webp?.size && webp.type === 'image/webp') return { blob: webp, ext: 'webp' as const };
   const png = await blobFrom(canvas, 'image/png');
-  if (png?.size) return { blob: png, ext: 'png' as const };
+  if (png?.size) return png;
   throw new Error('encode');
 }
 
@@ -67,8 +65,8 @@ export function DownloadDialog({ entry, onClose, onError }: { entry: GalleryEntr
       await document.fonts.ready;
       const size = exportSize(format.width, format.height);
       renderMessage(canvas, entry.message, size.width, size.height, entry.name);
-      const { blob, ext } = await imageBlob(canvas);
-      const name = `imsend.ing-${entry.name.replace(/[^\p{L}\p{N}._-]/gu, '-')}-${format.label.replace(':', 'x')}.${ext}`;
+      const blob = await imageBlob(canvas);
+      const name = `imsend.ing-${entry.name.replace(/[^\p{L}\p{N}._-]/gu, '-')}-${format.label.replace(':', 'x')}.png`;
       const file = new File([blob], name, { type: blob.type });
       if (canShare(file)) {
         try {

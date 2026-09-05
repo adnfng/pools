@@ -421,6 +421,7 @@ export default function Home() {
     }
 
     function resize() {
+      if (document.activeElement === input.current) return;
       width = container.clientWidth;
       height = container.clientHeight;
       size = width < 600 ? 48 : 64;
@@ -457,7 +458,7 @@ export default function Home() {
       if (!overCue(x, y, pad)) return;
       event.preventDefault();
       aiming = { pointerId: event.pointerId, x, y };
-      container.setPointerCapture(event.pointerId);
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
       aimAt(x, y);
     }
 
@@ -517,7 +518,8 @@ export default function Home() {
       }
       aiming = null;
       aimLine.current?.classList.remove('is-visible');
-      if (container.hasPointerCapture(event.pointerId)) container.releasePointerCapture(event.pointerId);
+      const surface = event.currentTarget as HTMLElement;
+      if (surface.hasPointerCapture(event.pointerId)) surface.releasePointerCapture(event.pointerId);
     }
 
     function focusInput() {
@@ -530,23 +532,24 @@ export default function Home() {
       focusInput();
     }
 
+    const surface = input.current ?? container;
     const observer = new ResizeObserver(resize);
     observer.observe(container);
-    container.addEventListener('pointerdown', pointerDown, { passive: false });
-    container.addEventListener('pointermove', pointerMove, { passive: false });
-    container.addEventListener('pointerup', pointerUp);
-    container.addEventListener('pointercancel', pointerUp);
+    surface.addEventListener('pointerdown', pointerDown, { passive: false });
+    surface.addEventListener('pointermove', pointerMove, { passive: false });
+    surface.addEventListener('pointerup', pointerUp);
+    surface.addEventListener('pointercancel', pointerUp);
     window.addEventListener('keydown', onWindowKeyDown, true);
     engine.current = { update, reset };
     resize();
-    focusInput();
+    if (window.matchMedia('(pointer: fine)').matches) focusInput();
     return () => {
       observer.disconnect();
       window.removeEventListener('keydown', onWindowKeyDown, true);
-      container.removeEventListener('pointerdown', pointerDown);
-      container.removeEventListener('pointermove', pointerMove);
-      container.removeEventListener('pointerup', pointerUp);
-      container.removeEventListener('pointercancel', pointerUp);
+      surface.removeEventListener('pointerdown', pointerDown);
+      surface.removeEventListener('pointermove', pointerMove);
+      surface.removeEventListener('pointerup', pointerUp);
+      surface.removeEventListener('pointercancel', pointerUp);
       cancelAnimationFrame(frame);
       for (const ball of balls) {
         if (!ball) continue;
@@ -569,22 +572,7 @@ export default function Home() {
   }
 
   return (
-    <main
-      className="pool-page"
-      onPointerDownCapture={(event) => {
-        const canvas = host.current;
-        if (!canvas) {
-          input.current?.focus({ preventScroll: true });
-          return;
-        }
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const pad = event.pointerType === 'mouse' ? 6 : 22;
-        if (Math.hypot(x - cueHit.current.x, y - cueHit.current.y) <= cueHit.current.r + pad) return;
-        input.current?.focus({ preventScroll: true });
-      }}
-    >
+    <main className="pool-page">
       <div ref={host} className="pool-canvas" aria-hidden="true" />
       <span ref={cursor} className="pool-cursor" aria-hidden="true" />
       <span ref={aimLine} className="aim-line" aria-hidden="true" />

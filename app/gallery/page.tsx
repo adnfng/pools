@@ -7,9 +7,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BallLetters } from '@/components/ball-letters';
 import { ColoredName } from '@/components/colored-name';
 import { MessagePreview } from '@/components/message-preview';
-import { GalleryLightbox, type LightboxSelection } from '@/components/gallery-lightbox';
 import { useGallery } from '@/components/gallery-provider';
-import type { GalleryEntry, GalleryPage } from '@/lib/gallery';
+import { playbackPath, type GalleryEntry, type GalleryPage } from '@/lib/gallery';
 
 export default function Gallery() {
   const { pending, published, retry, dismiss } = useGallery();
@@ -19,7 +18,6 @@ export default function Gallery() {
   const [hasMore, setHasMore] = useState(true);
   const [downloadError, setDownloadError] = useState('');
   const [downloadEntry, setDownloadEntry] = useState<GalleryEntry | null>(null);
-  const [lightbox, setLightbox] = useState<LightboxSelection | null>(null);
   const cursor = useRef<string | null>(null);
   const busy = useRef(false);
   const end = useRef(false);
@@ -68,7 +66,7 @@ export default function Gallery() {
   const publishedIds = new Set(published.map((entry) => entry.id));
   const all = [...published, ...entries.filter((entry) => !publishedIds.has(entry.id))];
 
-  return <main className="gallery-page" ref={scroll} style={lightbox || downloadEntry ? { overflow: 'hidden' } : undefined}>
+  return <main className="gallery-page" ref={scroll} style={downloadEntry ? { overflow: 'hidden' } : undefined}>
     <header className="gallery-header">
       <Link href="/" className="pool-reset ball-button back-link" aria-label="Back to pools"><BallLetters text="BACK" /></Link>
     </header>
@@ -84,7 +82,7 @@ export default function Gallery() {
         </div>
         <div className="gallery-name"><ColoredName name={pending.name} /></div>
       </article>}
-      {all.map((entry) => <GalleryCard key={entry.id} entry={entry} onOpen={() => setLightbox({ entry })} onDownload={() => { setDownloadError(''); setDownloadEntry(entry); }} />)}
+      {all.map((entry) => <GalleryCard key={entry.id} entry={entry} onDownload={() => { setDownloadError(''); setDownloadEntry(entry); }} />)}
       {loading && Array.from({ length: all.length ? 5 : 10 }, (_, index) => <div className="gallery-card skeleton-card" aria-hidden="true" key={`skeleton-${index}`}><div className="gallery-image-placeholder skeleton" /><div className="skeleton-name skeleton" /></div>)}
     </div>
     {!loading && !error && !pending && !all.length && <div className="gallery-empty"><p>the first shot is yours.</p><Link className="pool-reset ball-button" href="/" aria-label="Make pool balls"><BallLetters text="PLAY" /></Link></div>}
@@ -95,15 +93,14 @@ export default function Gallery() {
     </div>
     {downloadError && <p className="download-status" role="alert">{downloadError}</p>}
     {downloadEntry && <DownloadDialog entry={downloadEntry} onClose={() => setDownloadEntry(null)} onError={setDownloadError} />}
-    {lightbox && <GalleryLightbox selection={lightbox} onClose={() => setLightbox(null)} />}
   </main>;
 }
 
-function GalleryCard({ entry, onOpen, onDownload }: { entry: GalleryEntry; onOpen: () => void; onDownload: () => void }) {
+function GalleryCard({ entry, onDownload }: { entry: GalleryEntry; onDownload: () => void }) {
   return <article className="gallery-card" aria-label={`Pool balls by ${entry.name}`}>
-    <button className="gallery-open" type="button" aria-label={`Play message by ${entry.name}: ${entry.message}`} onClick={onOpen}>
+    <Link className="gallery-open" href={playbackPath(entry.id)} prefetch={false} aria-label={`Play message by ${entry.name}: ${entry.message}`}>
       <MessagePreview message={entry.message} />
-    </button>
+    </Link>
     <div className="gallery-footer"><div className="gallery-name"><ColoredName name={entry.name} /></div>
     <button type="button" className="gallery-download" aria-label={`Download message by ${entry.name}`} onClick={onDownload}>
       <Download size={14} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />

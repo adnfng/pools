@@ -22,3 +22,4 @@ export type GalleryEntry = {
   order: string;
 };
 export type GalleryPage = { entries: GalleryEntry[]; cursor: string | null };
+export const playbackPath = (id: string) => `/gallery/${id}`;

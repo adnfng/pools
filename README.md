@@ -23,9 +23,9 @@ high-quality WebP locally on demand in 1:1 (3200 × 3200), 3:4 (2400 × 3200),
 or 9:16 (1800 × 3200); those images are never uploaded. Exports include a top-centered maker credit
 and an imsend.ing mini-ball watermark at the bottom.
 
-Opening a message shows a full-screen playable table with typing disabled and
-a two-line `made by` credit in the bottom left. PLAY opens your own blank table. Playing saved messages
-does not increment the typing metric. The main table's controls overlay the full
+Opening a message goes to `/gallery/<id>` — a shareable link to a full-screen
+playable table with typing disabled and a two-line `made by` credit. PLAY opens
+your own blank table. Playing saved messages does not increment the typing metric. The main table's controls overlay the full
 play area, and cue strength changes the aim line from faint black through yellow,
 orange, and red.
 

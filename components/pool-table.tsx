@@ -700,7 +700,7 @@ export function PoolTable({ entry }: { entry?: GalleryEntry }) {
       {entry ? <p className="table-by"><span className="by-label">made by</span> <ColoredName name={entry.name} /></p> : canSave && <button ref={saveButton} className="pool-reset ball-button table-save" type="button" aria-label="Save message" onClick={save}>
         <BallLetters text="SAVE" />
       </button>}
-      {!readOnly && <Link href="/gallery" className="pool-reset ball-button table-gallery" aria-label="Gallery"><BallLetters text="GALLERY" /></Link>}
+      <Link href="/gallery" className="pool-reset ball-button table-gallery" aria-label={readOnly ? 'Back to gallery' : 'Gallery'}><BallLetters text={readOnly ? 'BACK' : 'GALLERY'} /></Link>
       <div ref={host} className="pool-canvas" aria-hidden="true" />
       {!readOnly && <span ref={cursor} className="pool-cursor" aria-hidden="true" />}
       <span ref={aimLine} className="aim-line" aria-hidden="true" />

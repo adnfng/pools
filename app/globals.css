@@ -132,13 +132,10 @@ button:disabled { cursor: default; opacity: .35; }
 .table-save, .table-gallery { position: absolute; z-index: 5; top: max(18px, env(safe-area-inset-top)); }
 .table-save { right: max(18px, env(safe-area-inset-right)); }
 .table-gallery { left: max(18px, env(safe-area-inset-left)); }
-.gallery-open { overflow: hidden; display: block; position: relative; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
+.gallery-open { overflow: hidden; display: block; position: relative; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 8px; background: transparent; cursor: pointer; text-decoration: none; color: inherit; }
 .gallery-open:disabled { opacity: 1; }
 .gallery-open:focus-visible { outline: 2px solid #6797ff; outline-offset: -3px; }
 .gallery-end { margin: 16px auto; max-width: 100%; font-size: 16px; color: #E3E3E3; }
-.gallery-lightbox { position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; overflow: hidden; }
-.gallery-lightbox[open] { display: grid; place-items: center; }
-.gallery-lightbox::backdrop { background: transparent; }
 @media (max-width: 639px) {
   .table-save, .table-gallery { --ball-size: 24px; top: max(12px, env(safe-area-inset-top)); }
   .table-save { right: 6px; }

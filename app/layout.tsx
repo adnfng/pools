@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { GalleryProvider } from '@/components/gallery-provider';
 
 export const metadata: Metadata = {
-  title: 'pools',
-  icons: { icon: '/favicon.svg' },
+  title: 'imsend.ing',
+  icons: { icon: '/imsend-ing.svg' },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><GalleryProvider>{children}</GalleryProvider></body>
     </html>
   );
 }

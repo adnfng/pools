@@ -17,7 +17,9 @@ export function MessagePreview({ message, onReady }: { message: string; onReady?
       observer.disconnect();
       void document.fonts.ready.then(() => {
         if (disposed || !canvas.current) return;
-        renderMessage(canvas.current, message);
+        const width = canvas.current.clientWidth || 320;
+        const pixels = Math.min(640, Math.max(240, Math.round(width * Math.min(window.devicePixelRatio || 1, 2))));
+        renderMessage(canvas.current, message, pixels, pixels);
         setReady(true);
         readyCallback.current?.(canvas.current);
       });

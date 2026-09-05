@@ -15,7 +15,7 @@ export function renderMessage(canvas: HTMLCanvasElement, message: string, pixelW
   const bottom = author ? 112 : 0;
   const layout = messageLayout(message, width, height - top - bottom);
   const scene = new THREE.Scene();
-  const geometry = new THREE.SphereGeometry(1, 48, 32);
+  const geometry = new THREE.SphereGeometry(1, pixelWidth >= 900 ? 48 : 24, pixelWidth >= 900 ? 32 : 16);
   const materials: THREE.MeshBasicMaterial[] = [];
   try {
     clearTimeout(disposal);

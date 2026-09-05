@@ -532,7 +532,7 @@ export default function Home() {
       focusInput();
     }
 
-    const surface = input.current ?? container;
+    const surface: HTMLElement = input.current ?? container;
     const observer = new ResizeObserver(resize);
     observer.observe(container);
     surface.addEventListener('pointerdown', pointerDown, { passive: false });

@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
-import type { GalleryEntry } from '@/lib/gallery';
+import { newPlaybackId, type GalleryEntry } from '@/lib/gallery';
 
 type Submission = { id: string; name: string; message: string; status: 'uploading' | 'failed'; error?: string };
 type GalleryContext = {
@@ -42,7 +42,7 @@ export function GalleryProvider({ children }: { children: React.ReactNode }) {
 
   return <Context.Provider value={{
     pending, published,
-    submit: (message, name) => { void upload({ id: crypto.randomUUID(), message, name, status: 'uploading' }); },
+    submit: (message, name) => { void upload({ id: newPlaybackId(), message, name, status: 'uploading' }); },
     retry: () => { if (active.current?.status === 'failed') void upload(active.current); },
     dismiss: () => { if (active.current?.status !== 'uploading') { active.current = null; setPending(null); } },
   }}>{children}</Context.Provider>;

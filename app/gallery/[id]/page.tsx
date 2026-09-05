@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { PoolTable } from '@/components/pool-table';
-import { getEntry, validId } from '@/lib/gallery-store';
+import { normalizePlaybackId, playbackPath } from '@/lib/gallery';
+import { getEntry } from '@/lib/gallery-store';
 
 export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ id: string }> };
 
 async function loadEntry(id: string) {
-  if (!validId(id)) return null;
-  try { return await getEntry(id); }
+  const key = normalizePlaybackId(id);
+  if (!key) return null;
+  try { return await getEntry(key); }
   catch { return null; }
 }
 
@@ -25,7 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Playback({ params }: Props) {
-  const entry = await loadEntry((await params).id);
+  const requested = normalizePlaybackId((await params).id);
+  const entry = await loadEntry(requested);
   if (!entry) notFound();
+  if (entry.id !== requested) redirect(playbackPath(entry.id));
   return <PoolTable entry={entry} />;
 }

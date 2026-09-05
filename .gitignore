@@ -10,3 +10,8 @@ npm-debug.log*
 next-env.d.ts
 /data/metrics.json
 .vercel
+/data/gallery/
+/output/
+/.playwright-cli/
+
+/data/messages/

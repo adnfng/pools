@@ -81,6 +81,7 @@ button:disabled { cursor: default; opacity: .35; }
 .ball-button { text-decoration: none; min-height: 44px; align-items: center; justify-content: center; cursor: pointer; }
 .ball-button .letter-ball { transition: transform 140ms cubic-bezier(.23, 1, .32, 1); }
 .ball-button:active:not(:disabled) .letter-ball { transform: rotate(var(--ball-rotation, 0deg)) scale(.95); }
+.ball-button:active:not(:disabled):hover .letter-ball { transform: translateY(var(--ball-hover-y, 0px)) rotate(var(--ball-rotation, 0deg)) scale(.95); }
 .save-error { width: min(85vw, 340px); color: #9c3434; text-align: center; font-size: 11px; margin: 0 0 8px; }
 .icon-button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: transparent; color: #999; cursor: pointer; border-radius: 50%; transition: transform 140ms cubic-bezier(.23, 1, .32, 1), color 140ms ease; }
 .icon-button:active { transform: scale(.94); }
@@ -120,8 +121,7 @@ button:disabled { cursor: default; opacity: .35; }
   .pool-dock { bottom: max(18px, env(safe-area-inset-bottom)); }
 }
 @media (hover: hover) and (pointer: fine) {
-  .ball-button:not(:disabled):hover .letter-ball:nth-child(odd) { transform: translateY(-1px) rotate(var(--ball-rotation, 0deg)); }
-  .ball-button:not(:disabled):hover .letter-ball:nth-child(even) { transform: translateY(1px) rotate(var(--ball-rotation, 0deg)); }
+  .ball-button:not(:disabled):hover .letter-ball { transform: translateY(var(--ball-hover-y, -3px)) rotate(var(--ball-rotation, 0deg)); }
   .icon-button:hover { color: #333; }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -21,19 +21,29 @@ function exportSize(width: number, height: number) {
   return { width: Math.round(width * scale), height: Math.round(height * scale) };
 }
 
-function blobFrom(canvas: HTMLCanvasElement, type: string, quality?: number) {
-  return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
-}
-
-async function imageBlob(canvas: HTMLCanvasElement) {
-  const png = await blobFrom(canvas, 'image/png');
-  if (png?.size) return png;
-  throw new Error('encode');
-}
-
 function canShare(file: File) {
   try { return !!navigator.canShare?.({ files: [file] }); }
   catch { return false; }
+}
+
+async function deliver(file: File) {
+  if (canShare(file)) {
+    try {
+      await navigator.share({ files: [file] });
+      return 'shared' as const;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return 'shared' as const;
+      if (!appleTouch()) throw error;
+    }
+  }
+  if (appleTouch()) return 'hold' as const;
+  const url = URL.createObjectURL(file);
+  const link = Object.assign(document.createElement('a'), { href: url, download: file.name });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+  return 'saved' as const;
 }
 
 export function DownloadDialog({ entry, onClose, onError }: { entry: GalleryEntry; onClose: () => void; onError: (message: string) => void }) {
@@ -44,18 +54,6 @@ export function DownloadDialog({ entry, onClose, onError }: { entry: GalleryEntr
   useEffect(() => { dialog.current?.showModal(); }, []);
   useEffect(() => () => { if (holdUrl) URL.revokeObjectURL(holdUrl); }, [holdUrl]);
 
-  function hold(file: File) {
-    setHoldUrl((current) => {
-      if (current) URL.revokeObjectURL(current);
-      return URL.createObjectURL(file);
-    });
-  }
-
-  function done() {
-    dialog.current?.close();
-    onClose();
-  }
-
   async function download(format: typeof formats[number]) {
     if (active.current) return;
     active.current = true;
@@ -65,30 +63,19 @@ export function DownloadDialog({ entry, onClose, onError }: { entry: GalleryEntr
       await document.fonts.ready;
       const size = exportSize(format.width, format.height);
       renderMessage(canvas, entry.message, size.width, size.height, entry.name);
-      const blob = await imageBlob(canvas);
-      const name = `imsend.ing-${entry.name.replace(/[^\p{L}\p{N}._-]/gu, '-')}-${format.label.replace(':', 'x')}.png`;
-      const file = new File([blob], name, { type: blob.type });
-      if (canShare(file)) {
-        try {
-          await navigator.share({ files: [file] });
-          done();
-          return;
-        } catch (error) {
-          if (error instanceof DOMException && error.name === 'AbortError') { done(); return; }
-          if (appleTouch()) { hold(file); return; }
-          throw error;
-        }
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob?.size) throw new Error('encode');
+      const file = new File([blob], `imsend.ing-${entry.name.replace(/[^\p{L}\p{N}._-]/gu, '-')}-${format.label.replace(':', 'x')}.png`, { type: blob.type });
+      const result = await deliver(file);
+      if (result === 'hold') {
+        setHoldUrl((current) => {
+          if (current) URL.revokeObjectURL(current);
+          return URL.createObjectURL(file);
+        });
+      } else {
+        dialog.current?.close();
+        onClose();
       }
-      if (appleTouch()) { hold(file); return; }
-      const url = URL.createObjectURL(file);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
-      done();
     } catch {
       onError('Could not create the download. Please try again.');
     } finally {

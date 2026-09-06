@@ -317,41 +317,20 @@ export function PoolTable({ entry }: { entry?: GalleryEntry }) {
 
     function layout() {
       if (width <= 0 || height <= 0) return;
-      size = messageLayout(text, width, height, width < 600 ? 48 : 64).size;
-      const chars = graphemes(text);
-      const gap = size * 0.075;
-      const step = size + gap;
-      const available = Math.min(width - 48, 900);
-      const rows: { indices: number[]; width: number }[] = [{ indices: [], width: 0 }];
-      const positions: { row: number; x: number }[] = [];
-      for (let i = 0; i < chars.length; i++) {
-        let row = rows[rows.length - 1];
-        if (chars[i] !== '\n' && row.width + step > available && row.indices.length) {
-          rows.push({ indices: [], width: 0 });
-          row = rows[rows.length - 1];
-        }
-        positions[i] = { row: rows.length - 1, x: row.width };
-        if (chars[i] === '\n') {
-          rows.push({ indices: [], width: 0 });
-          continue;
-        }
-        row.indices.push(i);
-        row.width += /\s/u.test(chars[i]) ? step * 0.55 : step;
-      }
-      positions[chars.length] = { row: rows.length - 1, x: rows[rows.length - 1].width };
-      const rowHeight = size * 1.16;
-      const totalHeight = rows.length * rowHeight;
+      const arranged = messageLayout(text, width, height, width < 600 ? 48 : 64);
+      size = arranged.size;
       const selectedIndex = graphemeIndex(text, selection);
-      const caret = positions[Math.min(selectedIndex, chars.length)];
-      let firstY = height / 2 - totalHeight / 2 + rowHeight / 2;
-      if (totalHeight > height - size * 2) firstY = Math.min(size, height - size - caret.row * rowHeight);
-      rows.forEach((row, rowIndex) => {
-        const start = (width - Math.max(0, row.width - gap)) / 2;
-        for (const i of row.indices) {
-          const ball = balls[i];
-          if (!ball) continue;
-          moveHome(ball, start + positions[i].x + size / 2, firstY + rowIndex * rowHeight);
-        }
+      let caret = arranged.caret(selectedIndex);
+      let shiftY = 0;
+      if (arranged.totalHeight > height - size * 2) {
+        shiftY = Math.min(Math.max(caret.y, size), height - size) - caret.y;
+        caret = { x: caret.x, y: caret.y + shiftY };
+      }
+      arranged.chars.forEach((_, index) => {
+        const ball = balls[index];
+        const position = arranged.positions[index];
+        if (!ball || !position) return;
+        moveHome(ball, position.x, position.y + shiftY);
       });
       if (replaySpawnPending && text === entry?.message) {
         const pad = Math.min(Math.min(width, height) / 3, Math.max(size * 1.15, 64));
@@ -371,9 +350,7 @@ export function PoolTable({ entry }: { entry?: GalleryEntry }) {
       const spawn = cueSpawn();
       moveHome(cueBall, spawn.x, spawn.y);
       if (cursor.current) {
-        const row = rows[caret.row];
-        const x = chars.length ? (width - Math.max(0, row.width - gap)) / 2 + caret.x - gap / 2 : width / 2;
-        cursor.current.style.transform = `translate(${x}px, ${firstY + caret.row * rowHeight - size * 0.35}px)`;
+        cursor.current.style.transform = `translate(${caret.x}px, ${caret.y - size * 0.35}px)`;
         cursor.current.style.height = `${size * 0.7}px`;
       }
       invalidate();

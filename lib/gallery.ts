@@ -6,7 +6,7 @@ export const MAX_REQUEST_BYTES = 32 * 1024;
 export const BALL_COLORS = ['#6797FF', '#FFA01A', '#52ED6A', '#333333', '#FE5CF9', '#4AF4F4', '#A073FF', '#FFE658', '#FF3636'];
 
 export function cleanName(value: string) {
-  return graphemes(value.normalize('NFC').replace(/[^\p{L}\p{N}\p{M} @._'-]/gu, '')).slice(0, NAME_LIMIT).join('');
+  return graphemes(value.normalize('NFC').replace(/[^\p{L}\p{N}\p{M}\p{P}\p{S} ]/gu, '')).slice(0, NAME_LIMIT).join('');
 }
 export function validName(value: string) {
   return value === cleanName(value) && value === value.trim() && value.length > 0;

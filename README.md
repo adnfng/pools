@@ -13,7 +13,7 @@ key sounds are cherry mx black samples from [kbsim](https://github.com/tplai/kbs
 Save stores the typed **message and name**, plus an ID and timestamp. No screenshot,
 ball positions, image file, or image-storage service is needed. Messages can contain
 up to 500 graphemes (an emoji sequence counts as one). Names allow up to 20 letters,
-numbers, spaces, and `@ . _ ' -` and display as subtly tilted black text.
+numbers, punctuation, or symbols and display as subtly tilted black text.
 
 Send opens the gallery immediately with a pending card and a retry option on
 failure. The gallery loads 25 records at a time using a stable timestamp + UUID

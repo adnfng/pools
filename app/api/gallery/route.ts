@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     catch { throw new GalleryError('Could not read your message.', 400); }
     if (!body || typeof body !== 'object') throw new GalleryError('A message and name are required.', 400);
     const { name, id, message } = body;
-    if (typeof name !== 'string' || !validName(name)) throw new GalleryError('Use a name of 1–20 letters, numbers, spaces, or @ . _ \' -', 400);
+    if (typeof name !== 'string' || !validName(name)) throw new GalleryError('Use a name of 1–20 letters, numbers, or common symbols.', 400);
     if (typeof id !== 'string' || !validId(id)) throw new GalleryError('Invalid submission. Please save again.', 400);
     if (typeof message !== 'string' || !validMessage(message)) throw new GalleryError('Enter a message of 1–500 characters.', 400);
     const address = request.headers.get('x-vercel-forwarded-for')?.split(',')[0].trim() || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'local';

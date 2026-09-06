@@ -9,6 +9,7 @@
 :root { --background: #fff; --foreground: #0d0d0d; color-scheme: light; }
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--background); overscroll-behavior: none; }
+:focus { outline: none; }
 body { font-family: 'TT Rounds Neue', Arial, Helvetica, sans-serif; font-weight: 600; }
 .pool-page { position: relative; width: 100%; height: 100dvh; background: #fff; overflow: hidden; cursor: default; touch-action: none; }
 .pool-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; touch-action: none; }

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { newPlaybackId, type GalleryEntry } from '@/lib/gallery';
 
 type Submission = { id: string; name: string; message: string; status: 'uploading' | 'failed'; error?: string };
@@ -14,6 +14,15 @@ type GalleryContext = {
 const Context = createContext<GalleryContext | null>(null);
 
 export function GalleryProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    function skipMouseFocus(event: MouseEvent) {
+      const target = event.target;
+      if (!(target instanceof Element) || target.closest('input, textarea')) return;
+      if (target.closest('button, a')) event.preventDefault();
+    }
+    document.addEventListener('mousedown', skipMouseFocus);
+    return () => document.removeEventListener('mousedown', skipMouseFocus);
+  }, []);
   const [pending, setPending] = useState<Submission | null>(null);
   const [published, setPublished] = useState<GalleryEntry[]>([]);
   const active = useRef<Submission | null>(null);

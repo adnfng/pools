@@ -1,4 +1,5 @@
 import { MAX_REQUEST_BYTES, validMessage, validName } from '@/lib/gallery';
+import { blockedForGallery } from '@/lib/gallery-filter';
 import { GalleryError, listEntries, saveEntry, validCursor, validId } from '@/lib/gallery-store';
 
 export const runtime = 'nodejs';
@@ -39,7 +40,9 @@ export async function POST(request: Request) {
     const { name, id, message } = body;
     if (typeof name !== 'string' || !validName(name)) throw new GalleryError('Use a name of 1–20 letters, numbers, or common symbols.', 400);
     if (typeof id !== 'string' || !validId(id)) throw new GalleryError('Invalid submission. Please save again.', 400);
-    if (typeof message !== 'string' || !validMessage(message)) throw new GalleryError('Enter a message of 1–500 characters.', 400);
+    if (typeof message !== 'string' || !validMessage(message) || blockedForGallery(message) || blockedForGallery(name)) {
+      throw new GalleryError('Enter a message of 1–500 characters.', 400);
+    }
     const address = request.headers.get('x-vercel-forwarded-for')?.split(',')[0].trim() || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'local';
     return Response.json({ entry: await saveEntry(id, name, message, address) }, { status: 201 });
   } catch (error) { return failure(error); }

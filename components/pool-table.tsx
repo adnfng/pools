@@ -8,6 +8,7 @@ import { BallLetters } from '@/components/ball-letters';
 import { SaveDialog } from '@/components/save-dialog';
 import { useGallery } from '@/components/gallery-provider';
 import { MAX_MESSAGE_LENGTH, type GalleryEntry } from '@/lib/gallery';
+import { blockedForGallery } from '@/lib/gallery-filter';
 import { graphemes, graphemeIndex, deletionRange } from '@/lib/text';
 import { ColoredName } from '@/components/colored-name';
 import { messageLayout } from '@/lib/message-layout';
@@ -650,7 +651,7 @@ export function PoolTable({ entry }: { entry?: GalleryEntry }) {
   }
 
   function save() {
-    if (!value.trim()) return;
+    if (!value.trim() || blockedForGallery(value)) return;
     if (graphemes(value).length > MAX_MESSAGE_LENGTH) { setSaveError('Keep your message to 500 characters or fewer.'); return; }
     modalOpen.current = true;
     setSaveError('');
@@ -670,7 +671,7 @@ export function PoolTable({ entry }: { entry?: GalleryEntry }) {
     if (!composing.current) { committedValue.current = next; engine.current?.update(next, selection); }
   }
 
-  const canSave = !readOnly && !failed && !pending && !!value.trim() && graphemes(value).length <= MAX_MESSAGE_LENGTH;
+  const canSave = !readOnly && !failed && !pending && !!value.trim() && graphemes(value).length <= MAX_MESSAGE_LENGTH && !blockedForGallery(value);
 
   return (
     <main className="pool-page">

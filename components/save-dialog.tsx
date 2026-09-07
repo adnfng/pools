@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { graphemeIndex } from '@/lib/text';
 import { cleanName } from '@/lib/gallery';
+import { blockedForGallery } from '@/lib/gallery-filter';
 import { BallLetters } from './ball-letters';
 import { ColoredName } from './colored-name';
 import { useGallery } from './gallery-provider';
@@ -44,7 +45,7 @@ export function SaveDialog({ message, onClose }: { message: string; onClose: () 
     </button>
     <form onSubmit={(event) => {
       event.preventDefault();
-      if (!name.trim()) return;
+      if (!name.trim() || blockedForGallery(name) || blockedForGallery(message)) return;
       submit(message, name.trim());
       router.push('/gallery');
       onClose();
@@ -58,7 +59,7 @@ export function SaveDialog({ message, onClose }: { message: string; onClose: () 
           onKeyDown={(event) => { if (!event.repeat) playKeyPress(event.key); }}
           onKeyUp={(event) => playKeyRelease(event.key)} />
       </div>
-      <button className="pool-reset ball-button send-button" type="submit" disabled={!name.trim()} aria-label="Send to gallery"><BallLetters text="SEND" /></button>
+      <button className="pool-reset ball-button send-button" type="submit" disabled={!name.trim() || blockedForGallery(name) || blockedForGallery(message)} aria-label="Send to gallery"><BallLetters text="SEND" /></button>
     </form>
   </dialog>;
 }
